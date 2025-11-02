@@ -4,13 +4,15 @@ import com.blogging.blogging_platform.dtos.BlogPostDto;
 import com.blogging.blogging_platform.entity.BlogPost;
 import com.blogging.blogging_platform.mapper.BlogPostMapper;
 import com.blogging.blogging_platform.repository.BlogPostRepository;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.UUID;
-import org.springframework.stereotype.Service;
 
 @Service
-public class BlogPostServiceImpl implements BlogPostService{
+public class BlogPostServiceImpl implements BlogPostService {
 
     private final BlogPostRepository blogPostRepository;
     private final BlogPostMapper blogPostMapper;
@@ -34,7 +36,7 @@ public class BlogPostServiceImpl implements BlogPostService{
 
     @Override
     public BlogPostDto getPostById(UUID id) {
-        BlogPost blogPost = blogPostRepository.findById(id).orElseThrow(() -> new RuntimeException("Post not found with id: " + id));
+        BlogPost blogPost = blogPostRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found"));
         return blogPostMapper.toDto(blogPost);
     }
 
@@ -44,14 +46,14 @@ public class BlogPostServiceImpl implements BlogPostService{
     }
 
     @Override
-    public BlogPostDto getPostByTitle(String title){
+    public BlogPostDto getPostByTitle(String title) {
         BlogPost blogPost = blogPostRepository.findByTitle(title);
         return blogPostMapper.toDto(blogPost);
     }
 
     @Override
     public BlogPostDto updatePost(UUID id, BlogPostDto blogPostDto) {
-        BlogPost existing = blogPostRepository.findById(id).orElseThrow(() -> new RuntimeException("Post not found"));
+        BlogPost existing = blogPostRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found"));
 
         existing.setTitle(blogPostDto.title());
         existing.setContent(blogPostDto.content());
@@ -65,6 +67,10 @@ public class BlogPostServiceImpl implements BlogPostService{
 
     @Override
     public void deletePost(UUID id) {
+
+        if (!blogPostRepository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found");
+        }
         blogPostRepository.deleteById(id);
     }
 }

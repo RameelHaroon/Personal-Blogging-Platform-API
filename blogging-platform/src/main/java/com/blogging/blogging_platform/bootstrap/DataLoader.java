@@ -23,6 +23,8 @@ public class DataLoader implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
+        blogPostRepository.deleteAll();
+
         // Create sample blog posts
         BlogPost post1 = new BlogPost();
         post1.setTitle("Getting Started with Spring Boot");

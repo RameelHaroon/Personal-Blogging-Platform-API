@@ -26,7 +26,7 @@ public class BlogPost {
     private String title;
 
     @NotBlank
-    @Lob
+    @Size(max = 1500)
     private String content;
 
     @NotBlank

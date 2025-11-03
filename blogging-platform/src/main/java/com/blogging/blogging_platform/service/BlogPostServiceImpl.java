@@ -4,6 +4,9 @@ import com.blogging.blogging_platform.dtos.BlogPostDto;
 import com.blogging.blogging_platform.entity.BlogPost;
 import com.blogging.blogging_platform.mapper.BlogPostMapper;
 import com.blogging.blogging_platform.repository.BlogPostRepository;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -23,6 +26,7 @@ public class BlogPostServiceImpl implements BlogPostService {
     }
 
     @Override
+    @CachePut(value = "BLOG_POST_CACHE", key = "#result.id()")
     public BlogPostDto createPost(BlogPostDto blogPostDto) {
         BlogPost entity = blogPostMapper.toEntity(blogPostDto);
         BlogPost saved = blogPostRepository.save(entity);
@@ -35,6 +39,7 @@ public class BlogPostServiceImpl implements BlogPostService {
     }
 
     @Override
+    @Cacheable(value = "BLOG_POST_CACHE", key = "#id")
     public BlogPostDto getPostById(UUID id) {
         BlogPost blogPost = blogPostRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found"));
         return blogPostMapper.toDto(blogPost);
@@ -52,20 +57,22 @@ public class BlogPostServiceImpl implements BlogPostService {
     }
 
     @Override
+    @CachePut(value = "BLOG_POST_CACHE", key = "#result.id()")
     public BlogPostDto updatePost(UUID id, BlogPostDto blogPostDto) {
         BlogPost existing = blogPostRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found"));
 
-        existing.setTitle(blogPostDto.title());
-        existing.setContent(blogPostDto.content());
-        existing.setAuthor(blogPostDto.author());
-        existing.setTag(blogPostDto.tag());
-        existing.setPublishingDate(blogPostDto.publishingDate());
+        existing.setTitle(blogPostDto.getTitle());
+        existing.setContent(blogPostDto.getContent());
+        existing.setAuthor(blogPostDto.getAuthor());
+        existing.setTag(blogPostDto.getTag());
+        existing.setPublishingDate(blogPostDto.getPublishingDate());
 
         BlogPost updated = blogPostRepository.save(existing);
         return blogPostMapper.toDto(updated);
     }
 
     @Override
+    @CacheEvict(value = "BLOG_POST_CACHE", key = "#id")
     public void deletePost(UUID id) {
 
         if (!blogPostRepository.existsById(id)) {

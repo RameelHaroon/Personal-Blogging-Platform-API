@@ -4,7 +4,6 @@ import com.blogging.blogging_platform.dtos.BlogPostDto;
 import com.blogging.blogging_platform.service.BlogPostServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.UUID;

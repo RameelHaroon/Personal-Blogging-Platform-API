@@ -41,7 +41,7 @@ public class BlogPostController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/v1/posts")
-    public BlogPostDto createPost(@RequestBody BlogPostDto post){
+    public BlogPostDto createPost(@RequestBody BlogPostDto post) {
         return this.blogPostServiceImpl.createPost(post);
     }
 
